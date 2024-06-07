@@ -1,0 +1,13 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+pydantic
+poetry-plugin-dotenv
+pytest
+exceptiongroup
+httpx
+flake8
+black
+psycopg[c]; sys_platform == "linux"
+psycopg[binary]; sys_platform != "linux"

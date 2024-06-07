@@ -1,0 +1,113 @@
+name: CI/CD Pipeline
+
+# Trigger the workflow on push or pull request events to the master branch
+on:
+  push:
+    branches:
+      - master
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  test:
+    # Define the environment where the job will run
+    runs-on: ubuntu-latest
+
+    # Define a matrix to run tests on multiple Python versions. Can have errors for dependencies between versions.
+    strategy:
+      matrix:
+        python-version: [3.9] # You can add more Python Versions but I only add one
+
+    # Define services required for the job
+    services:
+      postgres:
+        image: postgres:latest
+        ports:
+          - 5432:5432
+        env:
+          POSTGRES_USER: ${{ secrets.POSTGRES_USER }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          POSTGRES_DB: ${{ secrets.POSTGRES_DB }}
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    # Set environment variables
+    env:
+      DATABASE_URL: ${{ secrets.DATABASE_URL_TEST }}
+
+    steps:
+    # Step to checkout the code from the repository
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    # Step to set up the specified Python version
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v2
+      with:
+        python-version: ${{ matrix.python-version }}
+
+    # Step to cache Poetry dependencies to speed up builds
+    - name: Cache Poetry dependencies
+      uses: actions/cache@v2
+      with:
+        path: ~/.cache/pypoetry
+        key: ${{ runner.os }}-poetry-${{ hashFiles('**/poetry.lock') }}
+        restore-keys: |
+          ${{ runner.os }}-poetry-
+
+    # Step to install Poetry
+    - name: Install Poetry
+      run: |
+        curl -sSL https://install.python-poetry.org | python3 -
+
+    # Step to install project dependencies using Poetry
+    - name: Install dependencies
+      run: |
+        poetry install
+
+    # Step to lint the code using flake8
+    - name: Lint code
+      run: |
+        poetry run flake8 .
+
+    # Step to check code formatting using black
+    - name: Format code
+      run: |
+        poetry run black --check .
+
+    # Step to run unit tests with coverage
+    - name: Run tests with coverage
+      env:
+        DATABASE_URL_TEST: ${{ secrets.DATABASE_URL_TEST }}
+      run: |
+        poetry run pytest --cov=app --cov-report=xml --cov-report=html tests/
+    
+    # Step to upload coverage to Codecov
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v2
+      with:
+        name: coverage-report
+        path: htmlcov
+
+    # Step to archive test results
+    - name: Archive test results
+      uses: actions/upload-artifact@v2
+      with:
+        name: test-results
+        path: reports/test-results.xml
+
+    # Step to build the package using Poetry
+    - name: Build package
+      run: |
+        poetry build
+
+    # Step to upload build artifacts
+    - name: Archive build artifacts
+      uses: actions/upload-artifact@v2
+      with:
+        name: build-artifacts
+        path: dist/*
