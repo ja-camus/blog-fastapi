@@ -77,6 +77,7 @@ This will execute all the tests in the project.
 - **FastAPI**: A modern, fast (high-performance), web framework for building APIs with Python 3.6+ based on standard Python type hints.
 - **Uvicorn**: A lightning-fast ASGI server implementation, using uvloop and httptools.
 - **SQLAlchemy**: The Python SQL toolkit and Object-Relational Mapping (ORM) library.
+- **Poetry**: A tool for dependency management and packaging.
 - **Psycopg2-binary**: A PostgreSQL database adapter for Python.
 - **Pydantic**: Data validation and settings management using Python type annotations.
 - **python-dotenv**: Reads key-value pairs from a .env file and can set them as environment variables.

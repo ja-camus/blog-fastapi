@@ -3,11 +3,16 @@ uvicorn
 sqlalchemy
 psycopg2-binary
 pydantic
-poetry-plugin-dotenv
-pytest
-exceptiongroup
-httpx
 flake8
 black
+pytest
+httpx
+poetry-plugin-dotenv
+pytest-cov
+coverage
+faker
+ipdb
+passlib
+bcrypt
 psycopg[c]; sys_platform == "linux"
 psycopg[binary]; sys_platform != "linux"

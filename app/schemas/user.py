@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, EmailStr, validator
+from pydantic import BaseModel, Field, EmailStr, field_validator
 from app.database import get_db
 from app.models.user import UserManager
+from typing import Optional
 
 
 class UserBase(BaseModel):
@@ -8,7 +9,7 @@ class UserBase(BaseModel):
     email: EmailStr = Field(..., max_length=100)
     password: str = Field(..., min_length=6, max_length=100)
 
-    @validator("username")
+    @field_validator("username")
     def name_must_not_be_empty(cls, v):
         if not v.strip():
             raise ValueError("Username must not be empty")
@@ -16,20 +17,20 @@ class UserBase(BaseModel):
 
 
 class UserCreate(UserBase):
-    @validator("email")
+    @field_validator("email")
     def email_must_be_unique(cls, v, values, **kwargs):
         db = next(get_db())
         existing_user = UserManager.get_user_by_email(db, v)
         db.close()
         if existing_user:
-            raise ValueError("Email already regasasasistered")
+            raise ValueError("Email already registered")
         return v
 
 
 class UserUpdate(UserBase):
-    username: str = None
-    email: EmailStr = None
-    password: str = None
+    username: Optional[str] = Field(None, min_length=1, max_length=50)
+    email: Optional[EmailStr] = Field(None, max_length=100)
+    password: Optional[str] = Field(None, min_length=6, max_length=100)
 
 
 class User(UserBase):
