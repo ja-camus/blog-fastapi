@@ -1,0 +1,31 @@
+blog-fastapi/
+│
+├── app
+│   ├── __init__.py
+│   ├── database.py
+│   ├── main.py
+│   ├── controllers
+│   │   └── __init__.py
+│   │   └── ...
+│   ├── helpers
+│   │   └── __init__.py
+│   │   └── ...
+│   ├── models
+│   │   └── __init__.py
+│   │   └── ...
+│   ├── routers
+│   │   └── __init__.py
+│   │   └── ...
+│   └── schemas
+│       └──__init__.py
+│       └── ...
+│
+├── alembic/
+│       └── ...
+├── tests/
+│   ├── conftest.py
+│   └── ...
+│
+├── README.md
+├── pyproject.toml
+└── ...
