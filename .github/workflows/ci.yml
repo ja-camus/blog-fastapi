@@ -44,7 +44,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v2
 
-    # Step to set up the specified Python version
+    # Step to set up Python ${{ matrix.python-version }}
     - name: Set up Python ${{ matrix.python-version }}
       uses: actions/setup-python@v2
       with:
@@ -78,6 +78,11 @@ jobs:
     - name: Format code
       run: |
         poetry run black --check .
+
+    # Step to run migrations
+    - name: Run migrations
+      run: |
+        poetry run alembic upgrade head
 
     # Step to run unit tests with coverage
     - name: Run tests with coverage

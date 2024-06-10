@@ -1,5 +1,5 @@
-import pytest
 from app.helpers.utils import check_password
+
 
 class TestUserRoutes:
     # CreateUser
@@ -61,7 +61,6 @@ class TestUserRoutes:
     def test_update_user_with_invalid_email(self, client, user):
         new_data = {"email": "test_updated.com"}
         response = client.put(f"/users/{user.id}", json=new_data)
-        updated_user = response.json()
 
         assert response.status_code == 422
 
@@ -73,11 +72,9 @@ class TestUserRoutes:
         assert response.status_code == 200
         assert check_password(new_data["password"], updated_user["password"])
 
-
     def test_update_user_with_invalid_password(self, client, user):
         new_data = {"password": "123"}
         response = client.put(f"/users/{user.id}", json=new_data)
-        updated_user = response.json()
 
         assert response.status_code == 422
 
@@ -104,4 +101,3 @@ class TestUserRoutes:
         response = client.delete(f"/users/{user.id}")
 
         assert response.status_code == 200
-

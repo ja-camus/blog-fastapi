@@ -139,7 +139,6 @@ dmypy.json
 cython_debug/
 
 # Ignore Alembic generated files
-/alembic/env.py
 /alembic/alembic.ini
 /alembic/versions/*.pyc
 /alembic/versions/*.pyo

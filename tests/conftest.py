@@ -14,7 +14,7 @@ from app.models import User
 load_dotenv()
 
 # Set environment to testing
-os.environ['ENV'] = 'testing'
+os.environ["ENV"] = "testing"
 
 # Get DB URL
 DATABASE_URL = os.getenv("DATABASE_URL_TEST")
@@ -33,6 +33,7 @@ command.upgrade(alembic_cfg, "head")
 # DB Config for tests
 engine = create_engine(DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+
 
 # Define a fixture for the database session
 @pytest.fixture(scope="session")
@@ -72,7 +73,8 @@ def client():
         # Yield the test client to the tests
         yield c
 
-#Define a fixture to clean User Table
+
+# Define a fixture to clean User Table
 @pytest.fixture(autouse=True)
 def clean_database():
     db = TestingSessionLocal()
@@ -83,7 +85,8 @@ def clean_database():
     finally:
         db.close()
 
-#Define a fixture to create User
+
+# Define a fixture to create User
 @pytest.fixture
 def user():
     user_data = {
