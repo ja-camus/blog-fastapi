@@ -9,8 +9,33 @@ from app.controllers.user import (
     update_user,
     delete_user,
 )
+from app.helpers.auth import (
+    check_password,
+    create_access_token,
+    get_current_user,
+)
+from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from app.models.user import UserManager
 
 router = APIRouter()
+
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+
+@router.post("/login", response_model=dict)
+def login(
+    form_data: OAuth2PasswordRequestForm = Depends(),
+    db: Session = Depends(get_db),
+):
+    user = UserManager.get_user_by_username(db, form_data.username)
+    if not user or not check_password(form_data.password, user.password):
+        raise HTTPException(
+            status_code=401,
+            detail="Incorrect username or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    access_token = create_access_token(data={"sub": user.email})
+    return {"access_token": access_token, "token_type": "bearer"}
 
 
 @router.post("/users/", response_model=User)
@@ -19,7 +44,11 @@ def create_user_route(user: UserCreate, db: Session = Depends(get_db)):
 
 
 @router.get("/users/{user_id}", response_model=User)
-def read_user(user_id: int, db: Session = Depends(get_db)):
+def read_user(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     db_user = get_user(db, user_id=user_id)
     if db_user is None:
         raise HTTPException(status_code=404, detail="User not found")
@@ -27,14 +56,22 @@ def read_user(user_id: int, db: Session = Depends(get_db)):
 
 
 @router.get("/users/", response_model=list[User])
-def read_users(skip: int = 0, limit: int = 10, db: Session = Depends(get_db)):
+def read_users(
+    skip: int = 0,
+    limit: int = 10,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     users = get_users(db, skip=skip, limit=limit)
     return users
 
 
 @router.put("/users/{user_id}", response_model=User)
 def update_user_route(
-    user_id: int, user_update: UserUpdate, db: Session = Depends(get_db)
+    user_id: int,
+    user_update: UserUpdate,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
 ):
     db_user = update_user(db, user_id=user_id, user=user_update)
     if db_user is None:
@@ -43,7 +80,11 @@ def update_user_route(
 
 
 @router.delete("/users/{user_id}", response_model=bool)
-def delete_user_route(user_id: int, db: Session = Depends(get_db)):
+def delete_user_route(
+    user_id: int,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
     success = delete_user(db, user_id=user_id)
     if not success:
         raise HTTPException(status_code=404, detail="User not found")

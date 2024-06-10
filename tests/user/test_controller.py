@@ -9,7 +9,7 @@ from app.controllers.user import (
     delete_user,
 )
 from app.schemas.user import UserCreate, UserUpdate
-from app.helpers.utils import check_password
+from app.helpers.auth import check_password
 
 
 class TestUserController:

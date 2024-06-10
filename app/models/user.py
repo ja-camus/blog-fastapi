@@ -19,3 +19,7 @@ class UserManager:
     @classmethod
     def get_user_by_email(cls, db, email: str):
         return db.query(User).filter(User.email == email).first()
+
+    @classmethod
+    def get_user_by_username(cls, db, username: str):
+        return db.query(User).filter(User.username == username).first()

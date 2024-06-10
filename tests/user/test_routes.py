@@ -1,4 +1,4 @@
-from app.helpers.utils import check_password
+from app.helpers.auth import check_password
 
 
 class TestUserRoutes:
