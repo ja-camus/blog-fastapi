@@ -20,11 +20,13 @@ class UserManager:
     def get_user_by_email(cls, db, email: str):
         print(f"Buscando usuario con email: {email}")  # Agregar depuración
         users = db.query(User).all()  # Obtener todos los usuarios para depuración
-        print(f"Usuarios en la base de datos: {users}")  # Agregar depuración
+        for user in users:
+            print(
+                f"Usuario en la base de datos: {user.email}"
+            )  # Imprimir detalles de cada usuario
         user = db.query(User).filter(User.email == email).first()
         print(f"Usuario encontrado: {user}")  # Agregar depuración
         return user
-
 
     @classmethod
     def get_user_by_username(cls, db, username: str):

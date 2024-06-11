@@ -1,14 +1,14 @@
 import os
 import jwt
+from jwt import PyJWTError
 from app.database import get_db
 from app.models.user import User
 from app.models.user import UserManager
 from datetime import datetime, timedelta
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
-from jwt import PyJWTError
 from passlib.context import CryptContext
-
+from sqlalchemy.orm import Session
 
 SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = os.getenv("ALGORITHM")
@@ -37,7 +37,9 @@ def create_access_token(data: dict, expires_delta: timedelta = None):
     return encoded_jwt
 
 
-def decode_access_token(token: str = Depends(oauth2_scheme)):
+def decode_access_token(
+    db: Session = Depends(get_db), token: str = Depends(oauth2_scheme)
+):
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         email: str = payload.get("sub")
@@ -45,9 +47,7 @@ def decode_access_token(token: str = Depends(oauth2_scheme)):
             raise HTTPException(status_code=401, detail="Invalid Parameters")
     except PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
-    db = next(get_db())
     user = UserManager.get_user_by_email(db, email)
-    db.close()
     if user is None:
         raise HTTPException(status_code=401, detail="User non existent")
     return user

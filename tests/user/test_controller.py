@@ -11,6 +11,7 @@ from app.controllers.user import (
 from app.schemas.user import UserCreate, UserUpdate
 from app.helpers.auth import check_password
 
+
 class TestUserController:
     # CreateUser
     def test_create_user(self, db: Session):
@@ -89,15 +90,9 @@ class TestUserController:
 
         assert retrieved_user is None
 
-    def test_get_users(self, db: Session, user):
-        create_user(
-            db,
-            UserCreate(
-                username="user2", email="user2@example.com", password="password2"
-            ),
-        )
-
+    def test_get_users(self, db: Session, user, user2):
         users = get_users(db)
+
         assert len(users) >= 2
 
     # Delete
