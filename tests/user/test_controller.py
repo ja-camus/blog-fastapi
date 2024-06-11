@@ -11,7 +11,6 @@ from app.controllers.user import (
 from app.schemas.user import UserCreate, UserUpdate
 from app.helpers.auth import check_password
 
-
 class TestUserController:
     # CreateUser
     def test_create_user(self, db: Session):
@@ -108,3 +107,8 @@ class TestUserController:
 
         assert deleted is True
         assert retrieved_user is None
+
+    def test_delete_nonexistent_user(self, db: Session, user):
+        deleted = delete_user(db, 99999)
+
+        assert deleted is False

@@ -7,20 +7,17 @@ from alembic.config import Config
 from alembic import command
 from dotenv import load_dotenv
 from app.main import app
-from app.database import Base, get_db
+from app.database import Base
 from app.models import User
 
 # Load ENV Var from .env
 load_dotenv()
 
-# Set environment to testing
-os.environ["ENV"] = "testing"
-
 # Get DB URL
 DATABASE_URL = os.getenv("DATABASE_URL_TEST")
 
 if not DATABASE_URL:
-    raise ValueError("DATABASE_URL_TEST not present in .env")
+    raise ValueError("DATABASE_URL not present in .env")
 
 # Load Alembic configuration
 alembic_cfg = Config("alembic.ini")
@@ -34,6 +31,13 @@ command.upgrade(alembic_cfg, "head")
 engine = create_engine(DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
+# Define get_db inside conftest.py
+def get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
 
 # Define a fixture for the database session
 @pytest.fixture(scope="session")
@@ -51,28 +55,15 @@ def db():
         # Drop all tables in the database
         Base.metadata.drop_all(bind=engine)
 
-
 # Define a fixture for the FastAPI test client
 @pytest.fixture(scope="session")
 def client():
     # Override the get_db dependency to use the testing database session
-    def override_get_db():
-        try:
-            # Create a new database session
-            db = TestingSessionLocal()
-            # Yield the database session to the tests
-            yield db
-        finally:
-            # Close the database session
-            db.close()
-
-    # Override the get_db dependency in the FastAPI app
-    app.dependency_overrides[get_db] = override_get_db
+    app.dependency_overrides[get_db] = get_db
     # Create a FastAPI test client
     with TestClient(app) as c:
         # Yield the test client to the tests
         yield c
-
 
 # Define a fixture to clean User Table
 @pytest.fixture(autouse=True)

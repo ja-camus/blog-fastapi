@@ -18,7 +18,13 @@ class UserManager:
     # cls -> similar to self in instance methods
     @classmethod
     def get_user_by_email(cls, db, email: str):
-        return db.query(User).filter(User.email == email).first()
+        print(f"Buscando usuario con email: {email}")  # Agregar depuración
+        users = db.query(User).all()  # Obtener todos los usuarios para depuración
+        print(f"Usuarios en la base de datos: {users}")  # Agregar depuración
+        user = db.query(User).filter(User.email == email).first()
+        print(f"Usuario encontrado: {user}")  # Agregar depuración
+        return user
+
 
     @classmethod
     def get_user_by_username(cls, db, username: str):
