@@ -6,6 +6,7 @@ pydantic
 flake8
 black
 pytest
+pyjwt
 httpx
 poetry-plugin-dotenv
 pytest-cov

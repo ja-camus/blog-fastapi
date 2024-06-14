@@ -9,7 +9,7 @@ from app.controllers.user import (
     delete_user,
 )
 from app.schemas.user import UserCreate, UserUpdate
-from app.helpers.utils import check_password
+from app.helpers.auth import check_password
 
 
 class TestUserController:
@@ -90,15 +90,9 @@ class TestUserController:
 
         assert retrieved_user is None
 
-    def test_get_users(self, db: Session, user):
-        create_user(
-            db,
-            UserCreate(
-                username="user2", email="user2@example.com", password="password2"
-            ),
-        )
-
+    def test_get_users(self, db: Session, user, user2):
         users = get_users(db)
+
         assert len(users) >= 2
 
     # Delete
@@ -108,3 +102,8 @@ class TestUserController:
 
         assert deleted is True
         assert retrieved_user is None
+
+    def test_delete_nonexistent_user(self, db: Session, user):
+        deleted = delete_user(db, 99999)
+
+        assert deleted is False

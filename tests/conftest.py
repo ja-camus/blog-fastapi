@@ -1,3 +1,4 @@
+# TESTS/CONFTEST.PY
 import os
 import pytest
 from fastapi.testclient import TestClient
@@ -9,15 +10,19 @@ from dotenv import load_dotenv
 from app.main import app
 from app.database import Base, get_db
 from app.models import User
+from app.helpers.auth import hash_password
+
+# Set environment variable for testing
+os.environ["ENV"] = "testing"
+print(f"ENV set to: {os.getenv('ENV')}")
 
 # Load ENV Var from .env
 load_dotenv()
-
-# Set environment to testing
-os.environ["ENV"] = "testing"
+print(".env loaded")
 
 # Get DB URL
 DATABASE_URL = os.getenv("DATABASE_URL_TEST")
+print(f"DATABASE_URL_TEST from .env: {DATABASE_URL}")
 
 if not DATABASE_URL:
     raise ValueError("DATABASE_URL_TEST not present in .env")
@@ -25,14 +30,28 @@ if not DATABASE_URL:
 # Load Alembic configuration
 alembic_cfg = Config("alembic.ini")
 alembic_cfg.set_main_option("sqlalchemy.url", DATABASE_URL)
-alembic_cfg.set_main_option("script_location", "alembic")
+print("Alembic configuration set")
 
 # Run Alembic migrations
 command.upgrade(alembic_cfg, "head")
+print("Alembic migrations run")
 
 # DB Config for tests
 engine = create_engine(DATABASE_URL)
 TestingSessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+print("Testing database session configured")
+
+
+# Override the get_db dependency to use the testing database session
+def override_get_db():
+    db = TestingSessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+
+app.dependency_overrides[get_db] = override_get_db
 
 
 # Define a fixture for the database session
@@ -55,19 +74,6 @@ def db():
 # Define a fixture for the FastAPI test client
 @pytest.fixture(scope="session")
 def client():
-    # Override the get_db dependency to use the testing database session
-    def override_get_db():
-        try:
-            # Create a new database session
-            db = TestingSessionLocal()
-            # Yield the database session to the tests
-            yield db
-        finally:
-            # Close the database session
-            db.close()
-
-    # Override the get_db dependency in the FastAPI app
-    app.dependency_overrides[get_db] = override_get_db
     # Create a FastAPI test client
     with TestClient(app) as c:
         # Yield the test client to the tests
@@ -92,6 +98,27 @@ def user():
     user_data = {
         "username": "test_user",
         "email": "test@example.com",
+        "password": hash_password("testpassword"),
+    }
+    db = TestingSessionLocal()
+
+    user = User(**user_data)
+    db.add(user)
+    db.commit()
+    try:
+        yield user
+    finally:
+        db.delete(user)
+        db.commit()
+        db.close()
+
+
+# Define a fixture to create User
+@pytest.fixture
+def user2():
+    user_data = {
+        "username": "test_user_2",
+        "email": "test_2@example.com",
         "password": "testpassword",
     }
 
