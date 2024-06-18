@@ -36,8 +36,8 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     email: EmailStr
-    role_id: int | None = None
-    role: Role | None = None
+    role_id: Optional[int] = None
+    role: Optional[Role] = None
 
     class ConfigDict:
         orm_mode = True

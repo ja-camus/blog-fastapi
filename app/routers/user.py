@@ -70,7 +70,7 @@ def read_users(
 def update_user_route(
     user_id: int,
     user_update: UserUpdate,
-    current_user: User = Depends(lambda db: get_current_user(db)),
+    current_user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
 ):
     db_user = update_user(db, user_id=user_id, user=user_update)
