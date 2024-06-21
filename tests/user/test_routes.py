@@ -78,22 +78,36 @@ class TestUserRoutes:
             "/users/999999", headers={"Authorization": f"Bearer {token}"}
         )
 
-        assert response.status_code == 404
+        assert response.status_code == 403
 
-    def test_get_all_users(self, client, user):
-        token = create_access_token(data={"sub": user.email})
+    def test_get_all_users_as_admin(self, client, db, admin_user):
+        token = create_access_token(data={"sub": admin_user.email})
         response = client.get("/users/", headers={"Authorization": f"Bearer {token}"})
 
         assert response.status_code == 200
 
+    def test_get_all_users_as_non_admin(self, client, user):
+        token = create_access_token(data={"sub": user.email})
+        response = client.get("/users/", headers={"Authorization": f"Bearer {token}"})
+
+        assert response.status_code == 403  # No se permite acceder como usuario normal
+
     # DeleteUser
-    def test_delete_user(self, client, user):
+    def test_delete_user_as_admin(self, client, db, admin_user):
+        token = create_access_token(data={"sub": admin_user.email})
+        response = client.delete(
+            f"/users/{admin_user.id}", headers={"Authorization": f"Bearer {token}"}
+        )
+
+        assert response.status_code == 200
+
+    def test_delete_user_as_non_admin(self, client, user):
         token = create_access_token(data={"sub": user.email})
         response = client.delete(
             f"/users/{user.id}", headers={"Authorization": f"Bearer {token}"}
         )
 
-        assert response.status_code == 200
+        assert response.status_code == 403  # No se permite eliminar como usuario normal
 
     # Verify decoding of a valid token with an existing user.
     def test_decode_access_token_valid(self, client, db, user):

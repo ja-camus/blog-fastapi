@@ -6,21 +6,27 @@ blog-fastapi/
 │   ├── main.py
 │   ├── controllers
 │   │   └── __init__.py
+│   │   └── user.py
 │   │   └── ...
 │   ├── helpers
 │   │   └── __init__.py
+│   │   └── auth.py
 │   │   └── ...
 │   ├── models
 │   │   └── __init__.py
+│   │   └── user.py
 │   │   └── ...
 │   ├── routers
 │   │   └── __init__.py
+│   │   └── user.py
 │   │   └── ...
 │   └── schemas
 │       └──__init__.py
+│       └── user.py
 │       └── ...
 │
 ├── alembic/
+│       └── env.py
 │       └── ...
 ├── tests/
 │   ├── conftest.py
@@ -28,4 +34,5 @@ blog-fastapi/
 │
 ├── README.md
 ├── pyproject.toml
+├── alembic.ini
 └── ...

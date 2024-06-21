@@ -2,6 +2,7 @@ from pydantic import BaseModel, Field, EmailStr, field_validator
 from app.database import get_db
 from app.models.user import UserManager
 from typing import Optional
+from .role import Role
 
 
 class UserBase(BaseModel):
@@ -36,6 +37,8 @@ class UserUpdate(UserBase):
 class User(UserBase):
     id: int
     email: EmailStr
+    role_id: Optional[int] = None
+    role: Optional[Role] = None
 
     class ConfigDict:
         orm_mode = True

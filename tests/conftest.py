@@ -1,15 +1,15 @@
-# TESTS/CONFTEST.PY
 import os
 import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 from alembic.config import Config
 from alembic import command
 from dotenv import load_dotenv
 from app.main import app
 from app.database import Base, get_db
-from app.models import User
+from app.models.user import User
+from app.models.role import Role
 from app.helpers.auth import hash_password
 
 # Set environment variable for testing
@@ -80,7 +80,7 @@ def client():
         yield c
 
 
-# Define a fixture to clean User Table
+# Define a fixture to clean the database
 @pytest.fixture(autouse=True)
 def clean_database():
     db = TestingSessionLocal()
@@ -92,44 +92,85 @@ def clean_database():
         db.close()
 
 
-# Define a fixture to create User
+# Define a fixture to create a contributor role
+@pytest.fixture(scope="session")
+def contributor_role(db: Session):
+    role = db.query(Role).filter(Role.name == "contributor").first()
+    if not role:
+        role = Role(name="contributor", description="Contributor role")
+        db.add(role)
+        db.commit()
+        db.refresh(role)
+    return role
+
+
+# Define a fixture to create an admin role
+@pytest.fixture(scope="session")
+def admin_role(db: Session):
+    role = db.query(Role).filter(Role.name == "admin").first()
+    if not role:
+        role = Role(name="admin", description="Administrator role")
+        db.add(role)
+        db.commit()
+        db.refresh(role)
+    return role
+
+
+# Define a fixture to create a user with contributor role
 @pytest.fixture
-def user():
+def user(db: Session, contributor_role: Role):
     user_data = {
         "username": "test_user",
         "email": "test@example.com",
         "password": hash_password("testpassword"),
+        "role_id": contributor_role.id,
     }
-    db = TestingSessionLocal()
-
     user = User(**user_data)
     db.add(user)
     db.commit()
+    db.refresh(user)
     try:
         yield user
     finally:
         db.delete(user)
         db.commit()
-        db.close()
 
 
-# Define a fixture to create User
+# Define a fixture to create a second user with contributor role
 @pytest.fixture
-def user2():
+def user2(db: Session, contributor_role: Role):
     user_data = {
         "username": "test_user_2",
         "email": "test_2@example.com",
-        "password": "testpassword",
+        "password": hash_password("testpassword"),
+        "role_id": contributor_role.id,
     }
-
-    db = TestingSessionLocal()
-
     user = User(**user_data)
     db.add(user)
     db.commit()
+    db.refresh(user)
     try:
         yield user
     finally:
         db.delete(user)
         db.commit()
-        db.close()
+
+
+# Define a fixture to create an admin user
+@pytest.fixture
+def admin_user(db: Session, admin_role: Role):
+    user_data = {
+        "username": "admin_user",
+        "email": "admin@example.com",
+        "password": hash_password("adminpassword"),
+        "role_id": admin_role.id,
+    }
+    user = User(**user_data)
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+    try:
+        yield user
+    finally:
+        db.delete(user)
+        db.commit()
