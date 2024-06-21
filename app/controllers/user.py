@@ -12,7 +12,7 @@ def create_user(db: Session, user: UserCreate):
         username=user.username,
         email=user.email,
         password=hash_password(user.password),
-        role_id=role.id
+        role_id=role.id,
     )
     db_user.password = hash_password(user.password)
     db.add(db_user)
@@ -36,17 +36,17 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
     db_user = db.query(User).filter(User.id == user_id).first()
 
     print(f"User with id {user_id} not found.")
-    
+
     if not db_user:
         return None
 
     user_data = vars(user)
-    
+
     print(f"Updating user with data: {user_data}")
 
     for key, value in user_data.items():
         if value is not None:
-            print(f"Setting {key} to {value}") 
+            print(f"Setting {key} to {value}")
             setattr(db_user, key, value)
 
     db.commit()

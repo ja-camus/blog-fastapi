@@ -4,6 +4,7 @@ from app.models.user import UserManager
 from typing import Optional
 from .role import Role
 
+
 class UserBase(BaseModel):
     username: str = Field(..., min_length=1, max_length=50)
     email: EmailStr = Field(..., max_length=100)

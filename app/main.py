@@ -16,5 +16,6 @@ def on_startup():
     seed_admin_user(db)
     db.close()
 
+
 app.include_router(user.router, tags=["users"])
 app.include_router(role.router, tags=["roles"])

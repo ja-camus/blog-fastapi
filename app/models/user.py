@@ -12,9 +12,10 @@ class User(Base):
     password = Column(String, nullable=True)
     created_at = Column(TIMESTAMP, nullable=True)
     updated_at = Column(TIMESTAMP, nullable=True)
-    role_id = Column(Integer, ForeignKey('roles.id'))
+    role_id = Column(Integer, ForeignKey("roles.id"))
 
-    role = relationship('Role', back_populates='users')
+    role = relationship("Role", back_populates="users")
+
 
 class UserManager:
     # cls -> similar to self in instance methods

@@ -3,6 +3,7 @@ from app.models.user import User
 from app.models.role import Role
 from app.helpers.auth import hash_password
 
+
 def seed_admin_user(db: Session):
     admin_role = db.query(Role).filter(Role.name == "admin").first()
     if not admin_role:

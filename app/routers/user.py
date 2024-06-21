@@ -14,7 +14,6 @@ from app.helpers.auth import (
     create_access_token,
     get_current_user,
     get_current_user_role,
-    require_admin,
 )
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from app.models.user import UserManager

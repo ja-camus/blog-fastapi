@@ -62,7 +62,9 @@ def get_current_user(token: str = Depends(decode_access_token)) -> User:
     return token
 
 
-def get_current_user_role(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+def get_current_user_role(
+    db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
     user = db.query(User).filter(User.id == current_user.id).first()
     if user and user.role:
         return user.role.name

@@ -15,6 +15,7 @@ from app.helpers.auth import get_current_user, require_admin
 
 router = APIRouter()
 
+
 @router.post("/roles/", response_model=Role, dependencies=[Depends(require_admin)])
 def create_role_route(
     role: RoleCreate,
@@ -24,7 +25,9 @@ def create_role_route(
     return create_role(db=db, role=role)
 
 
-@router.get("/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)])
+@router.get(
+    "/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)]
+)
 def read_role(
     role_id: int,
     current_user: User = Depends(get_current_user),
@@ -47,7 +50,9 @@ def read_roles(
     return roles
 
 
-@router.put("/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)])
+@router.put(
+    "/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)]
+)
 def update_role_route(
     role_id: int,
     role_update: RoleUpdate,
@@ -60,7 +65,9 @@ def update_role_route(
     return db_role
 
 
-@router.delete("/roles/{role_id}", response_model=bool, dependencies=[Depends(require_admin)])
+@router.delete(
+    "/roles/{role_id}", response_model=bool, dependencies=[Depends(require_admin)]
+)
 def delete_role_route(
     role_id: int,
     current_user: User = Depends(get_current_user),

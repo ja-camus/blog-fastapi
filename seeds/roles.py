@@ -1,6 +1,7 @@
 from sqlalchemy.orm import Session
 from app.models.role import Role
 
+
 def seed_roles(db: Session):
     roles = ["admin", "editor", "viewer", "contributor", "guest"]
     for role_name in roles:
