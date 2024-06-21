@@ -8,6 +8,8 @@ from app.schemas.user import UserCreate, UserUpdate
 # Create
 def create_user(db: Session, user: UserCreate):
     role = db.query(Role).filter(Role.name == "contributor").first()
+    if not role:
+        raise ValueError("Default role not found in the database.")
     db_user = User(
         username=user.username,
         email=user.email,
@@ -46,8 +48,10 @@ def update_user(db: Session, user_id: int, user: UserUpdate):
 
     for key, value in user_data.items():
         if value is not None:
-            print(f"Setting {key} to {value}")
-            setattr(db_user, key, value)
+            if key == "password":
+                setattr(db_user, "password", hash_password(value))
+            else:
+                setattr(db_user, key, value)
 
     db.commit()
     db.refresh(db_user)

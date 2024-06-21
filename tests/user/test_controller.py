@@ -10,11 +10,16 @@ from app.controllers.user import (
 )
 from app.schemas.user import UserCreate, UserUpdate
 from app.helpers.auth import check_password
+from app.models.role import Role
+from app.models.user import User
+from seeds.roles import seed_roles
 
 
 class TestUserController:
     # CreateUser
     def test_create_user(self, db: Session):
+        seed_roles(db)
+
         user_data = UserCreate(
             username="test_user", email="test@example.com", password="testpassword"
         )
@@ -103,7 +108,25 @@ class TestUserController:
         assert deleted is True
         assert retrieved_user is None
 
-    def test_delete_nonexistent_user(self, db: Session, user):
+    def test_delete_nonexistent_user(self, db: Session):
         deleted = delete_user(db, 99999)
 
         assert deleted is False
+
+    # Role Permissions
+    def test_create_user_with_admin_role(self, db: Session, contributor_role: Role):
+        user_data = UserCreate(
+            username="admin_user", email="admin@example.com", password="adminpassword"
+        )
+        created_user = create_user(db, user_data)
+        assert created_user.role_id == contributor_role.id
+
+    def test_user_cannot_update_other_user(self, db: Session, user: User, user2: User):
+        updated_data = UserUpdate(username="unauthorized_update")
+        with pytest.raises(Exception):  # Replace with appropriate exception
+            update_user(db, user2.id, updated_data, current_user_id=user.id)
+
+    def test_admin_can_update_other_user(self, db: Session, user, user2, admin_user):
+        updated_data = UserUpdate(username="admin_update")
+        updated_user = update_user(db, user2.id, updated_data)
+        assert updated_user.username == updated_data.username
