@@ -1,5 +1,3 @@
-# app/routers/role.py
-
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.schemas.role import RoleCreate, RoleUpdate, Role
@@ -12,11 +10,12 @@ from app.controllers.role import (
     update_role,
     delete_role,
 )
-from app.helpers.auth import get_current_user
+from app.helpers.auth import get_current_user, require_admin
+
 
 router = APIRouter()
 
-@router.post("/roles/", response_model=Role)
+@router.post("/roles/", response_model=Role, dependencies=[Depends(require_admin)])
 def create_role_route(
     role: RoleCreate,
     current_user: User = Depends(get_current_user),
@@ -25,7 +24,7 @@ def create_role_route(
     return create_role(db=db, role=role)
 
 
-@router.get("/roles/{role_id}", response_model=Role)
+@router.get("/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)])
 def read_role(
     role_id: int,
     current_user: User = Depends(get_current_user),
@@ -37,7 +36,7 @@ def read_role(
     return db_role
 
 
-@router.get("/roles/", response_model=list[Role])
+@router.get("/roles/", response_model=list[Role], dependencies=[Depends(require_admin)])
 def read_roles(
     skip: int = 0,
     limit: int = 10,
@@ -48,7 +47,7 @@ def read_roles(
     return roles
 
 
-@router.put("/roles/{role_id}", response_model=Role)
+@router.put("/roles/{role_id}", response_model=Role, dependencies=[Depends(require_admin)])
 def update_role_route(
     role_id: int,
     role_update: RoleUpdate,
@@ -61,7 +60,7 @@ def update_role_route(
     return db_role
 
 
-@router.delete("/roles/{role_id}", response_model=bool)
+@router.delete("/roles/{role_id}", response_model=bool, dependencies=[Depends(require_admin)])
 def delete_role_route(
     role_id: int,
     current_user: User = Depends(get_current_user),
