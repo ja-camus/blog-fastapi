@@ -2,6 +2,7 @@ from sqlalchemy import Column, Integer, String, Text, ForeignKey, TIMESTAMP
 from sqlalchemy.orm import relationship
 from app.database import Base
 
+
 class Publication(Base):
     __tablename__ = "publications"
 
