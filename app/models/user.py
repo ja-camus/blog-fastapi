@@ -15,6 +15,7 @@ class User(Base):
     role_id = Column(Integer, ForeignKey("roles.id"))
 
     role = relationship("Role", back_populates="users")
+    publications = relationship("Publication", back_populates="user")
 
 
 class UserManager:

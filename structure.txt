@@ -7,6 +7,7 @@ blog-fastapi/
 │   ├── controllers
 │   │   └── __init__.py
 │   │   └── user.py
+│   │   └── role.py
 │   │   └── ...
 │   ├── helpers
 │   │   └── __init__.py
@@ -15,14 +16,17 @@ blog-fastapi/
 │   ├── models
 │   │   └── __init__.py
 │   │   └── user.py
+│   │   └── role.py
 │   │   └── ...
 │   ├── routers
 │   │   └── __init__.py
 │   │   └── user.py
+│   │   └── role.py
 │   │   └── ...
 │   └── schemas
 │       └──__init__.py
 │       └── user.py
+│       └── role.py
 │       └── ...
 │
 ├── alembic/
