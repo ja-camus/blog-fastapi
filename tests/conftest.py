@@ -10,6 +10,7 @@ from app.main import app
 from app.database import Base, get_db
 from app.models.user import User
 from app.models.role import Role
+from app.models.publication import Publication
 from app.helpers.auth import hash_password
 
 # Set environment variable for testing
@@ -85,6 +86,7 @@ def client():
 def clean_database():
     db = TestingSessionLocal()
     try:
+        db.query(Publication).delete()
         db.query(User).delete()
         db.commit()
         yield db
@@ -134,6 +136,17 @@ def user(db: Session, contributor_role: Role):
     finally:
         db.delete(user)
         db.commit()
+
+
+@pytest.fixture
+def publication(db: Session, user: User):
+    publication = Publication(
+        title="Test Publication", content="This is a test.", user_id=user.id
+    )
+    db.add(publication)
+    db.commit()
+    db.refresh(publication)
+    return publication
 
 
 # Define a fixture to create a second user with contributor role
