@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from app.database import engine, Base, SessionLocal
-from app.routers import user, role, publication
+from app.routers import user, role, publication, comment
 from seeds.roles import seed_roles
 from seeds.users import seed_admin_user
 
@@ -20,3 +20,4 @@ def on_startup():
 app.include_router(user.router, tags=["users"])
 app.include_router(role.router, tags=["roles"])
 app.include_router(publication.router, tags=["publications"])
+app.include_router(comment.router, tags=["comments"])

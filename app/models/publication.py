@@ -14,3 +14,4 @@ class Publication(Base):
     user_id = Column(Integer, ForeignKey("users.id"), nullable=False)
 
     user = relationship("User", back_populates="publications")
+    comments = relationship("Comment", back_populates="publication")

@@ -16,6 +16,7 @@ class User(Base):
 
     role = relationship("Role", back_populates="users")
     publications = relationship("Publication", back_populates="user")
+    comments = relationship("Comment", back_populates="user")
 
 
 class UserManager:
