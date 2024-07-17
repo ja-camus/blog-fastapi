@@ -106,6 +106,8 @@ The project uses a relational database to manage data. Below are the key tables 
 
 - **users**: Stores user information, including username, hashed password, and other relevant details.
 - **roles**: Manages user roles and permissions, defining what actions each role can perform within the application.
+- **publications**
+- **comments**
 
 
 Feel free to reach out if you have any questions or need further assistance!
